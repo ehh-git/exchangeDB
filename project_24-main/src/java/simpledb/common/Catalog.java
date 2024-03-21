@@ -91,10 +91,14 @@ public class Catalog {
      */
     public int getTableId(String name) throws NoSuchElementException {
         // some code goes here
-        if (!nameToId.containsKey(name)) {
-            throw new NoSuchElementException("Table " + name + " does not exist");
+        if(name == null){
+            throw new NoSuchElementException("Table is null");
         }
-        return nameToId.get(name);
+        if (nameToId.containsKey(name)) {
+            return nameToId.get(name);
+        } else {
+            throw new NoSuchElementException("Key is invalid");
+        }
     }
 
     /**

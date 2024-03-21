@@ -203,13 +203,17 @@ public class TupleDesc implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        // some code goes here
-        // maybe check size? use .numFields?
-        // maybe redundant
         if (this == o) return true;
-        if (getClass() != o.getClass() || o == null) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         TupleDesc tupleDesc = (TupleDesc) o;
-        return Arrays.equals(TDItems, tupleDesc.TDItems);
+        if (TDItems.length != tupleDesc.TDItems.length) return false;
+        for (int i = 0; i < TDItems.length; i++) {
+            if (!TDItems[i].fieldType.equals(tupleDesc.TDItems[i].fieldType) ||
+                !Objects.equals(TDItems[i].fieldName, tupleDesc.TDItems[i].fieldName)) {
+                return false;
+            }
+        }
+    return true;
     }
 
     @Override
