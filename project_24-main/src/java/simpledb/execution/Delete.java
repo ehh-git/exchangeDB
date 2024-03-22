@@ -19,6 +19,10 @@ import java.io.IOException;
 public class Delete extends Operator {
 
     private static final long serialVersionUID = 1L;
+    private TransactionId tid;
+    private OpIterator child;
+    private boolean ifcalled = false;
+    private TupleDesc tupleDesc;
 
     /**
      * Constructor specifying the transaction that this delete belongs to as
@@ -31,23 +35,31 @@ public class Delete extends Operator {
      */
     public Delete(TransactionId t, OpIterator child) {
         // some code goes here
+        this.tid = t;
+        this.child = child;
+        tupleDesc = new TupleDesc(new Type[]{Type.INT_TYPE});
     }
 
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return null;
+        return tupleDesc;
     }
 
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
+        child.open();
+        super.open();
     }
 
     public void close() {
         // some code goes here
+        child.close();
+        super.close();
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
         // some code goes here
+        child.rewind();
     }
 
     /**
@@ -59,20 +71,50 @@ public class Delete extends Operator {
      * @see Database#getBufferPool
      * @see BufferPool#deleteTuple
      */
+
+    //This should also work once we have bufferPool functions working
     protected Tuple fetchNext() throws TransactionAbortedException, DbException {
         // some code goes here
+        int deletedRecordsCount = 0;
+
+        // Check if the method is called for the first time
+        if (!ifcalled) {
+            // Process each tuple from the child operator
+            while (child.hasNext()) {
+                // Get the next tuple
+                Tuple tuple = child.next();
+
+                //Not implemented the deleteTUple yet
+                try {
+                    Database.getBufferPool().deleteTuple(tid, tuple);
+                    
+                } catch (IOException e) {
+                    throw new DbException("Error occurred while deleting tuple: " + e.getMessage());
+                }
+                deletedRecordsCount++;
+            }
+            // Mark that the method has been called once
+            ifcalled = true;
+            // Create a new tuple containing the count of deleted records
+            Tuple resultTuple = new Tuple(getTupleDesc());
+            resultTuple.setField(0, new IntField(deletedRecordsCount));
+            return resultTuple;
+        }
         return null;
+        
     }
 
     @Override
     public OpIterator[] getChildren() {
         // some code goes here
-        return null;
+        return new OpIterator[]{child};
     }
 
     @Override
     public void setChildren(OpIterator[] children) {
         // some code goes here
+        if (children.length > 1)
+            child = children[0];
     }
 
 }
