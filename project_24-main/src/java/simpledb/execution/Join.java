@@ -75,18 +75,22 @@ public class Join extends Operator {
     public void open() throws DbException, NoSuchElementException,
             TransactionAbortedException {
         // some code goes here
-        // I don't know how it would throw no such element
+        super.open();
         this.child1.open();
         this.child2.open();
-        super.open();
+        if (child1.hasNext()) {
+            tempTuple = child1.next();
+        }
+        
     }
 
     public void close() {
         // some code goes here
         // I don't know how it would throw no such element
+        super.close();
         this.child1.close();
         this.child2.close();
-        super.close();
+        
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
