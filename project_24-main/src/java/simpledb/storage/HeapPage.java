@@ -23,7 +23,7 @@ public class HeapPage implements Page {
     final TupleDesc td;
     final byte[] header;
     final Tuple[] tuples;
-    final int numSlots;
+    final int slotNum;
 
     byte[] oldData;
     private final Byte oldDataLock= (byte) 0;
@@ -47,7 +47,7 @@ public class HeapPage implements Page {
     public HeapPage(HeapPageId id, byte[] data) throws IOException {
         this.pid = id;
         this.td = Database.getCatalog().getTupleDesc(id.getTableId());
-        this.numSlots = getNumTuples();
+        this.slotNum = getNumTuples();
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
 
         // allocate and read the header slots of this page
@@ -55,7 +55,7 @@ public class HeapPage implements Page {
         for (int i=0; i<header.length; i++)
             header[i] = dis.readByte();
         
-        tuples = new Tuple[numSlots];
+        tuples = new Tuple[slotNum];
         try{
             // allocate and read the actual records of this page
             for (int i=0; i<tuples.length; i++)
@@ -80,7 +80,7 @@ public class HeapPage implements Page {
      * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      */
     private int getHeaderSize() {        
-        return (int) Math.ceil((double) numSlots / 8);
+        return (int) Math.ceil((double) slotNum / 8);
     }
     
     /** Return a view of this page before it was modified
@@ -204,7 +204,7 @@ public class HeapPage implements Page {
         }
 
         // padding
-        int zerolen = BufferPool.getPageSize() - (header.length + td.getSize() * tuples.length); //- numSlots * td.getSize();
+        int zerolen = BufferPool.getPageSize() - (header.length + td.getSize() * tuples.length); //- slotNum * td.getSize();
         byte[] zeroes = new byte[zerolen];
         try {
             dos.write(zeroes, 0, zerolen);
@@ -282,7 +282,7 @@ public class HeapPage implements Page {
      */
     public int getNumEmptySlots() {
         int emptySlots = 0;
-        for (int i = 0;i < numSlots; i++) {
+        for (int i = 0;i < slotNum; i++) {
             if (!(this.isSlotUsed(i))) {
                 emptySlots++;
             }

@@ -21,6 +21,7 @@ public class Aggregate extends Operator {
     private int gfield;
     private Aggregator.Op aop;
     private OpIterator iterator;
+    private Aggregator aggregator;
 
     /**
      * Constructor.
@@ -60,7 +61,11 @@ public class Aggregate extends Operator {
      */
     public String groupFieldName() {
         // some code goes here
-        return null;
+        if (gfield == Aggregator.NO_GROUPING){
+            return null;
+        }
+        return child.getTupleDesc().getFieldName(gfield);
+        
     }
 
     /**
@@ -94,8 +99,15 @@ public class Aggregate extends Operator {
 
     public void open() throws NoSuchElementException, DbException,
             TransactionAbortedException {
-        // some code goes here
+        super.open();
+        child.open();
+        while (child.hasNext()){
+            aggregator.mergeTupleIntoGroup(child.next());
+        }
+        iterator.open();
+        child.rewind();
     }
+    
 
     /**
      * Returns the next tuple. If there is a group by field, then the first
@@ -106,11 +118,15 @@ public class Aggregate extends Operator {
      */
     protected Tuple fetchNext() throws TransactionAbortedException, DbException {
         // some code goes here
+        if (iterator.hasNext()){
+            return iterator.next();
+        }
         return null;
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
-        // some code goes here
+        iterator.rewind();
+        child.rewind();
     }
 
     /**
@@ -133,6 +149,7 @@ public class Aggregate extends Operator {
         // some code goes here
         this.child.close();
         this.iterator.close();
+        super.close();
     }
 
     @Override

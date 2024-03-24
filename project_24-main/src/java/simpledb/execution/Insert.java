@@ -100,7 +100,7 @@ public class Insert extends Operator {
                     Database.getBufferPool().insertTuple(tid, this.tableId,tuple);
                     
                 } catch (IOException e) {
-                    throw new DbException("Error occurred while deleting tuple: " + e.getMessage());
+                    throw new DbException("Error occurred while inserting tuple: " + e.getMessage());
                 }
                 insertedRecordsNum++;
             }
