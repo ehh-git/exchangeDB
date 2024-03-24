@@ -183,6 +183,7 @@ java.util.ArrayList
 simpledb.storage.BufferPool
 java.io.ByteArrayInputStream
 java.io.DataOutputStream
+simpledb.transaction.TransactionId
 simpledb.common.Database
 java.lang.Math
 java.util.NoSuchElementException
