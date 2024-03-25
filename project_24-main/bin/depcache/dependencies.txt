@@ -862,6 +862,7 @@ simpledb.common.DbException
 simpledb.storage.Tuple
 java.io.IOException
 java.io.File
+simpledb.storage.Page
 java.util.ArrayList
 simpledb.storage.BufferPool
 java.util.List
@@ -870,11 +871,11 @@ simpledb.storage.DbFile
 simpledb.transaction.TransactionId
 simpledb.storage.HeapPageId
 simpledb.storage.HeapFile
+simpledb.storage.RecordId
 simpledb.common.Database
 java.lang.Math
 simpledb.common.Permissions
 java.lang.Object
-java.lang.String
 simpledb.transaction.TransactionAbortedException
 simpledb.storage.HeapPage
 ||:simpledb.storage.RecordId
